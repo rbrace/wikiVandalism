@@ -24,7 +24,7 @@ def GetRevisions(pageTitle):
         next = "&rvcontinue=" + cont.group(1)             #gets the revision Id from which to start the next request
 
     return revisions;
-revisions = GetRevisions("David_P._Steiner")
+revisions = GetRevisions("Abraham_Lincoln")
 vandalismRev = []
 vandalIDs = []
 revIDs = {}
@@ -69,11 +69,11 @@ def getDiff(pTitle, revList):
 
 	return changes
 
-t = getDiff("David_P._Steiner", vandalIDs)
+t = getDiff("Abraham_Lincoln", vandalIDs)
 #for z in t:
 #	print(z)
 
-filename = "kinkaid.html"
+filename = "out.html"
 fz = open(filename, "w")
 fz.writelines(t)
 fz.write("</html>")
