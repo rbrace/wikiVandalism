@@ -25,7 +25,8 @@ def GetRevisions(pageTitle):
 """
 def mostRecent():
     filt = []
-    rcURL = "https://en.wikipedia.org/w/api.php?action=query&list=recentchanges&rcprop=title|ids|sizes|user|comment&rclimit=500&format=xml"
+	dictFilt = {}
+	rcURL = "https://en.wikipedia.org/w/api.php?action=query&list=recentchanges&rcprop=title|ids|sizes|user|comment&rclimit=500&format=xml"
     #rcURL = "https://en.wikipedia.org/w/api.php?action=query&list=recentchanges&rcprop=title|ids|flags&rclimit=500&format=xml"
     response = urllib2.urlopen(rcURL).read()
     root = ET.fromstring(str(response))
@@ -35,7 +36,11 @@ def mostRecent():
     for child in root[1][0]:
         if 'vandalism' in str(child.attrib):
             #print(child.attrib)
-            print(str(str(child.attrib).split("'revid': \'")[1].split("\'")[0]))
+			tempID = str(child.attrib).split("'revid': \'")[1].split("\'")[0]
+            filt.append(tempID)
+			tempTitle = str(child.attrib).split("\'title=\"")[1].split("\"")
+			print(tempTitle)
+			dictFilt.update({tempID:tempTitle}) 
             #print(child.attrib)
         #filt += child
     #zzz = re.findall('<rc type="edit"*>', response)    
@@ -47,10 +52,33 @@ def locate(IP_List):
         response = urllib.urlopen('http://api.hostip.info/get_html.php?ip=' + IP + '&position=true').read()
 
 
+def getDiff(pTitle, revList):
+	iterate = 0
+	changes = []
+	header = {'User-Agent': 'Mozilla/5.0'} 
+	wiki = "https://en.wikipedia.org/w/index.php?title="+pTitle+"&diff="
+	if iterate%10==0:
+		time.sleep(5)
+	for d in revList:
+		tempWiki = wiki + d
+		req = urllib2.Request(tempWiki, headers=header)
+		tempPage = urllib2.urlopen(req)
+		tempSoup = BeautifulSoup(tempPage)
+		additions = str(tempSoup.find_all("td", {"class" : "diff-addedline"}))
+		if len(additions.split(" ")) < 1000:
+			changes += "<tr>"
+			changes += additions
+			changes += "</tr>"
+		iterate+=1
+
+	return changes
+
+
 test = []
 test = mostRecent()
+
+print(test)
 print("test")
-for z in test:
-    print(z)
-print(len(test))
+#for z in test:
+ #   print(z)
 
